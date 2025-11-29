@@ -1,0 +1,27 @@
+{
+  "name": "livekitagents",
+  "version": "1.0.0",
+  "description": "Vonage × LiveKit Agents × OpenAI Realtime - Voice AI Agent",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "node agent.js dev",
+    "start": "node agent.js start"
+  },
+  "keywords": [
+    "livekit",
+    "vonage",
+    "openai",
+    "realtime",
+    "voice-ai",
+    "sip"
+  ],
+  "author": "",
+  "license": "ISC",
+  "type": "module",
+  "dependencies": {
+    "@livekit/agents": "^1.0.22",
+    "@livekit/agents-plugin-openai": "^1.0.22",
+    "dotenv": "^17.2.3"
+  }
+}
