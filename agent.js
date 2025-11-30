@@ -1,7 +1,8 @@
-import { cli, ServerOptions, defineAgent, voice } from "@livekit/agents";
+import { cli, ServerOptions, defineAgent, voice, llm } from "@livekit/agents";
 import { realtime } from "@livekit/agents-plugin-openai";
 import dotenv from "dotenv";
 import { fileURLToPath } from "url";
+import { z } from "zod";
 
 // Load environment variables
 dotenv.config();
@@ -27,10 +28,35 @@ export default defineAgent({
     await ctx.connect();
     console.log("✅ Connected to room");
 
+    // Define tools using llm.tool()
+    const weatherTool = llm.tool({
+      description: "Get the weather for a location",
+      parameters: {
+        type: "object",
+        properties: {
+          location: {
+            type: "string",
+            description: "The location to get the weather for",
+          },
+        },
+        required: ["location"],
+      },
+      execute: async ({ location }) => {
+        console.log(`🌤️ Getting weather for ${location}`);
+        // Mock weather data
+        const weather = "晴れ";
+        const temperature = "25度";
+        return `現在の${location}の天気は${weather}、気温は${temperature}です。`;
+      },
+    });
+
     // Create the voice agent
     const agent = new voice.Agent({
-      instructions: "あなたは親切なAIアシスタントです。日本語で話してください。ユーザーの質問に丁寧に答えてください。",
+      instructions: "あなたは親切なAIアシスタントです。日本語で話してください。ユーザーの質問に丁寧に答えてください。天気の質問にはツールを使って答えてください。",
       llm: ctx.proc.userData.model,
+      tools: {
+        get_weather: weatherTool,
+      },
     });
 
     // Create and start the agent session
