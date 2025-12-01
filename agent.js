@@ -2,6 +2,8 @@ import { cli, ServerOptions, defineAgent, voice, llm } from "@livekit/agents";
 import { realtime } from "@livekit/agents-plugin-openai";
 import dotenv from "dotenv";
 import { fileURLToPath } from "url";
+import { readFileSync } from "fs";
+import { dirname, join } from "path";
 import { weatherTool } from "./tools/weather-tool.js";
 
 // Load environment variables
@@ -13,6 +15,12 @@ if (!openaiApiKey) {
   console.error("Error: OPENAI_API_KEY is missing in .env file.");
   process.exit(1);
 }
+
+// Read instructions from file
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+const instructionsPath = join(__dirname, "instructions.md");
+const instructions = readFileSync(instructionsPath, "utf-8").trim();
 
 // Define and export the agent
 export default defineAgent({
@@ -30,7 +38,7 @@ export default defineAgent({
 
     // Create the voice agent with tools
     const agent = new voice.Agent({
-      instructions: "あなたは親切なAIアシスタントです。日本語で話してください。ユーザーの質問に丁寧に答えてください。天気の質問にはツールを使って答えてください。",
+      instructions: instructions,
       llm: ctx.proc.userData.model,
       tools: {
         get_weather: weatherTool,
