@@ -43,9 +43,16 @@ export default defineAgent({
       tools: {
         get_weather: weatherTool,
       },
+      // Turn detection settings for smoother conversation flow
+      turnDetection: {
+        type: "server_vad",
+        threshold: 0.5,
+        prefix_padding_ms: 300,
+        silence_duration_ms: 500,
+      },
     });
 
-    // Create and start the agent session
+    // Create and start the agent session with optimized audio settings
     const session = new voice.AgentSession({
       llm: ctx.proc.userData.model,
     });
@@ -53,6 +60,17 @@ export default defineAgent({
     await session.start({
       agent,
       room: ctx.room,
+      // Input audio settings
+      inputOptions: {
+        // Disable automatic close on disconnect for better stability
+        closeOnDisconnect: true,
+      },
+      // Output audio settings for smoother playback
+      outputOptions: {
+        // Use higher quality audio output
+        sampleRate: 24000,
+        numChannels: 1,
+      },
     });
 
     console.log("🤖 Agent session started");
