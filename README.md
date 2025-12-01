@@ -17,18 +17,18 @@ Vonage SIP Trunking、LiveKit Cloud、OpenAI Realtime API を組み合わせた�
 ```mermaid
 graph TD
     User((ユーザーの電話))
-    Vonage[Vonage SIP Trunking<br/>(クラウド)]
+    Vonage["Vonage SIP Trunking<br/>(クラウド)"]
     
     subgraph LiveKit_Cloud [LiveKit Cloud]
         SIP_Gateway[SIP Gateway]
         Media_Server[Media Server]
-        Room[Room<br/>(仮想会議室)]
+        Room["Room<br/>(仮想会議室)"]
     end
     
-    subgraph Local_Env [ローカル開発環境<br/>(あなたのPC)]
-        Agent[Agent Worker<br/>(Node.js)]
-        Tools[カスタムツール<br/>(天気API)]
-        Note[ngrok不要<br/>ポート開放不要]
+    subgraph Local_Env ["ローカル開発環境<br/>(あなたのPC)"]
+        Agent["Agent Worker<br/>(Node.js)"]
+        Tools["カスタムツール<br/>(天気API)"]
+        Note["ngrok不要<br/>ポート開放不要"]
     end
     
     OpenAI[OpenAI Realtime API]
@@ -38,7 +38,7 @@ graph TD
     Vonage -->|SIP (TLS/SRTP)| SIP_Gateway
     SIP_Gateway -->|WebRTC| Room
     
-    Agent -->|WebSocket接続開始<br/>(Outbound)| Room
+    Agent -->|"WebSocket接続開始<br/>(Outbound)"| Room
     Room -.->|Job割り当て| Agent
 
     Agent <-->|WebSocket| OpenAI
