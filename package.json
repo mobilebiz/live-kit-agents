@@ -4,9 +4,12 @@
   "description": "Vonage × LiveKit Agents × OpenAI Realtime - Voice AI Agent",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
     "dev": "node agent.js dev",
-    "start": "node agent.js start"
+    "start": "node agent.js start",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:ui": "vitest --ui",
+    "test:coverage": "vitest run --coverage"
   },
   "keywords": [
     "livekit",
@@ -24,5 +27,9 @@
     "@livekit/agents-plugin-openai": "^1.0.22",
     "dotenv": "^17.2.3",
     "zod": "^4.1.13"
+  },
+  "devDependencies": {
+    "@vitest/ui": "^4.0.14",
+    "vitest": "^4.0.14"
   }
 }

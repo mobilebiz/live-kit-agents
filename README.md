@@ -10,6 +10,50 @@ Vonage SIP Trunking、LiveKit Cloud、OpenAI Realtime API を組み合わせた�
 *   **LiveKit Cloud アカウント**: 音声ストリーミング基盤として使用します。
 *   **OpenAI API Key**: `gpt-4o-realtime-preview` モデルへのアクセス権限が必要です。
 
+## 🏗️ アーキテクチャ
+
+本プロジェクトのシステム構成図です。
+
+```mermaid
+graph TD
+    User((ユーザーの電話))
+    Vonage[Vonage SIP Trunking<br/>(クラウド)]
+    
+    subgraph LiveKit_Cloud [LiveKit Cloud]
+        SIP_Gateway[SIP Gateway]
+        Media_Server[Media Server]
+        Room[Room<br/>(仮想会議室)]
+    end
+    
+    subgraph Local_Env [ローカル開発環境<br/>(あなたのPC)]
+        Agent[Agent Worker<br/>(Node.js)]
+        Tools[カスタムツール<br/>(天気API)]
+        Note[ngrok不要<br/>ポート開放不要]
+    end
+    
+    OpenAI[OpenAI Realtime API]
+    WeatherAPI[OpenWeatherMap API]
+
+    User -->|電話 (PSTN)| Vonage
+    Vonage -->|SIP (TLS/SRTP)| SIP_Gateway
+    SIP_Gateway -->|WebRTC| Room
+    
+    Agent -->|WebSocket接続開始<br/>(Outbound)| Room
+    Room -.->|Job割り当て| Agent
+
+    Agent <-->|WebSocket| OpenAI
+    Agent -->|HTTP| WeatherAPI
+    Tools -.-> Agent
+    
+    Note -.- Agent
+
+    style LiveKit_Cloud fill:#e6f3ff,stroke:#3399ff
+    style Local_Env fill:#f9f2ff,stroke:#9933ff
+    style Vonage fill:#fff0e6,stroke:#ff6600
+    style OpenAI fill:#e6fffa,stroke:#00cc99
+    style Note fill:#fff,stroke:#333,stroke-dasharray: 5 5
+```
+
 ## 🚀 セットアップ手順
 
 ### 1. リポジトリのクローンとインストール
@@ -35,10 +79,12 @@ LIVEKIT_URL=wss://<your-project>.livekit.cloud
 LIVEKIT_API_KEY=<your-api-key>
 LIVEKIT_API_SECRET=<your-api-secret>
 OPENAI_API_KEY=<your-openai-api-key>
+OPEN_WEATHER_API_KEY=<your-openweathermap-api-key>
 ```
 
 *   **LIVEKIT_URL, API_KEY, SECRET**: LiveKit Cloudのダッシュボード (Settings > Keys) から取得します。
 *   **OPENAI_API_KEY**: OpenAIのプラットフォームから取得します。
+*   **OPEN_WEATHER_API_KEY**: [OpenWeatherMap](https://openweathermap.org/api) でアカウントを作成し、API Keyを取得します（無料プランで利用可能）。
 
 ### 3. LiveKit Cloud と Vonage の設定
 
@@ -71,6 +117,114 @@ npm run dev
 
 起動後、Vonageで購入した電話番号に電話をかけると、エージェントが応答します。
 
+## 🔧 Function Calling（ツール機能）
+
+このエージェントは、OpenAI Realtime APIのFunction Calling機能をサポートしています。
+AIが必要に応じて外部ツールを呼び出し、情報を取得したり、アクションを実行したりできます。
+
+### 利用可能なツール
+
+#### `get_weather`
+指定された場所の天気情報をOpenWeatherMap APIから取得します。
+
+**使用例**:
+- 「今日の東京の天気は？」
+- 「大阪の天気を教えて」
+
+**注意**: OpenWeatherMap API Keyが必要です。`.env` ファイルに `OPEN_WEATHER_API_KEY` を設定してください。
+
+### カスタムツールの追加
+
+新しいツールを追加するには、以下の手順に従ってください：
+
+1. **ツールファイルの作成**
+
+`weather-tool.js` を参考に、新しいツールファイルを作成します：
+
+```javascript
+import { llm } from "@livekit/agents";
+
+export const myCustomTool = llm.tool({
+  description: "ツールの説明（AIがツールを使うかどうかの判断に使用されます）",
+  parameters: {
+    type: "object",
+    properties: {
+      param1: {
+        type: "string",
+        description: "パラメータの説明",
+      },
+    },
+    required: ["param1"],
+  },
+  execute: async ({ param1 }) => {
+    // ツールのロジックを実装
+    console.log(`Tool called with: ${param1}`);
+    return "結果をテキストで返します";
+  },
+});
+```
+
+2. **agent.jsでツールをインポート**
+
+```javascript
+import { myCustomTool } from "./my-custom-tool.js";
+```
+
+3. **ツールを登録**
+
+```javascript
+const agent = new voice.Agent({
+  // ...
+  tools: {
+    get_weather: weatherTool,
+    my_custom_tool: myCustomTool, // 新しいツールを追加
+  },
+});
+```
+
+## 🧪 テスト
+
+このプロジェクトでは、`vitest` を使用してユニットテストを実装しています。
+
+### テストの実行
+
+```bash
+# すべてのテストを実行
+npm test
+
+# ウォッチモードでテストを実行（ファイル変更時に自動再実行）
+npm run test:watch
+
+# UIモードでテストを実行
+npm run test:ui
+
+# カバレッジレポートを生成
+npm run test:coverage
+```
+
+### テストファイル
+
+*   `weather-tool.test.js`: 天気情報取得ツールのユニットテスト
+    - OpenWeatherMap APIのモック
+    - 正常系・異常系のテストケース
+    - エラーハンドリングのテスト
+
+### カスタムツールのテスト
+
+新しいツールを追加した場合は、対応するテストファイルも作成してください：
+
+```javascript
+import { describe, it, expect, vi } from 'vitest';
+import { myCustomTool } from './my-custom-tool.js';
+
+describe('My Custom Tool', () => {
+  it('should execute correctly', async () => {
+    const result = await myCustomTool.execute({ param1: 'test' });
+    expect(result).toBeDefined();
+  });
+});
+```
+
 ## 🛠️ トラブルシューティング
 
 *   **電話がすぐ切れる**:
@@ -84,5 +238,6 @@ npm run dev
 ## 📂 ファイル構成
 
 *   `agent.js`: AIエージェントのメインロジック。LiveKit Agentsフレームワークを使用しています。
+*   `weather-tool.js`: 天気情報取得ツールの定義。
 *   `live-kit-setup.md`: LiveKit CloudとVonageの詳細な設定手順書。
 *   `package.json`: プロジェクトの依存関係定義。
