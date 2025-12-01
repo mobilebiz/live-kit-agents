@@ -74,6 +74,37 @@ export default defineAgent({
     });
 
     console.log("🤖 Agent session started");
+
+    // Set up recording
+    const recordingDir = join(__dirname, "recording");
+    const timestamp = new Date().toISOString().replace(/[:.]/g, "-").slice(0, -5);
+    const recordingPath = join(recordingDir, `call_${timestamp}.log`);
+
+    console.log(`📼 Recording metadata will be saved to: ${recordingPath}`);
+
+    // Log call metadata
+    const callMetadata = {
+      startTime: new Date().toISOString(),
+      roomName: ctx.room?.name,
+      roomSid: ctx.room?.sid,
+    };
+
+    const fs = await import("fs/promises");
+    await fs.writeFile(recordingPath, JSON.stringify(callMetadata, null, 2));
+
+    // Listen for session end to update metadata
+    session.on("close", async () => {
+      try {
+        const endMetadata = {
+          ...callMetadata,
+          endTime: new Date().toISOString(),
+        };
+        await fs.writeFile(recordingPath, JSON.stringify(endMetadata, null, 2));
+        console.log(`📼 Recording metadata updated: ${recordingPath}`);
+      } catch (error) {
+        console.error("Error updating recording metadata:", error);
+      }
+    });
   },
 });
 

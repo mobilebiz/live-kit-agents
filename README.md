@@ -136,6 +136,29 @@ npm run dev
 
 **注意**: `instructions.md` の変更はエージェント再起動後に反映されます。
 
+## 📼 通話録音
+
+すべての通話のメタデータが自動的に `recording/` フォルダに保存されます。
+
+### 録音ファイル
+
+- **ファイル名**: `call_YYYY-MM-DDTHH-MM-SS.log`
+- **形式**: JSON
+- **内容**: 通話開始時刻、終了時刻、Room名、Room SID
+
+### 例
+
+```json
+{
+  "startTime": "2023-12-01T17:30:00.000Z",
+  "roomName": "call-room_818040643515_yB7GE2XuywUg",
+  "roomSid": "RM_w94A52oACmjF",
+  "endTime": "2023-12-01T17:35:00.000Z"
+}
+```
+
+> **注意**: 現在は通話メタデータのみを記録しています。音声ファイルの録音にはLiveKit Cloudのストレージ設定（S3など）が必要です。
+
 ## 🔧 Function Calling（ツール機能）
 
 このエージェントは、OpenAI Realtime APIのFunction Calling機能をサポートしています。

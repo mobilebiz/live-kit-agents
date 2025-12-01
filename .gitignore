@@ -25,3 +25,6 @@ build/
 
 # LiveKit config (contains sensitive data)
 livekit.yaml
+
+# Call recordings
+recording/
