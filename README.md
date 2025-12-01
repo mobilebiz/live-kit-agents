@@ -237,7 +237,10 @@ describe('My Custom Tool', () => {
 
 ## 📂 ファイル構成
 
-*   `agent.js`: AIエージェントのメインロジック。LiveKit Agentsフレームワークを使用しています。
-*   `weather-tool.js`: 天気情報取得ツールの定義。
+*   `agent.js`: AIエージェントのメインロジック。
+*   `tools/`: 外部ツール定義ディレクトリ
+    *   `weather-tool.js`: 天気情報取得ツール
+*   `tests/`: テストコードディレクトリ
+    *   `weather-tool.test.js`: 天気ツールのユニットテスト
 *   `live-kit-setup.md`: LiveKit CloudとVonageの詳細な設定手順書。
 *   `package.json`: プロジェクトの依存関係定義。

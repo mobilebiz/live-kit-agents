@@ -2,7 +2,7 @@ import { cli, ServerOptions, defineAgent, voice, llm } from "@livekit/agents";
 import { realtime } from "@livekit/agents-plugin-openai";
 import dotenv from "dotenv";
 import { fileURLToPath } from "url";
-import { weatherTool } from "./weather-tool.js";
+import { weatherTool } from "./tools/weather-tool.js";
 
 // Load environment variables
 dotenv.config();
