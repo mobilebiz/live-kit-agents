@@ -25,7 +25,7 @@ flowchart TD
         Room[Room 仮想会議室]
     end
     
-    subgraph Local_Env [ローカル開発環境 あなたのPC]
+    subgraph Local_Env [ローカル開発環境 Your PC]
         Agent[Agent Worker Node.js]
         Tools[カスタムツール 天気API]
         Note[ngrok不要 ポート開放不要]
