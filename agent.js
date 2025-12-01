@@ -60,7 +60,6 @@ export default defineAgent({
     await session.start({
       agent,
       room: ctx.room,
-      record: true,  // 録音を有効化
       // Input audio settings
       inputOptions: {
         // Disable automatic close on disconnect for better stability
