@@ -79,11 +79,13 @@ LIVEKIT_URL=wss://<your-project>.livekit.cloud
 LIVEKIT_API_KEY=<your-api-key>
 LIVEKIT_API_SECRET=<your-api-secret>
 OPENAI_API_KEY=<your-openai-api-key>
+OPENAI_VOICE=alloy
 OPEN_WEATHER_API_KEY=<your-openweathermap-api-key>
 ```
 
 *   **LIVEKIT_URL, API_KEY, SECRET**: LiveKit Cloudのダッシュボード (Settings > Keys) から取得します。
 *   **OPENAI_API_KEY**: OpenAIのプラットフォームから取得します。
+*   **OPENAI_VOICE** (オプション): OpenAI Realtime APIの話者を指定します。デフォルトは `alloy`。利用可能な値: `alloy`, `echo`, `shimmer`, `ash`, `ballad`, `coral`, `sage`, `verse`
 *   **OPEN_WEATHER_API_KEY**: [OpenWeatherMap](https://openweathermap.org/api) でアカウントを作成し、API Keyを取得します（無料プランで利用可能）。
 
 ### 3. LiveKit Cloud と Vonage の設定

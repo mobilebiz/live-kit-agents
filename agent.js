@@ -27,6 +27,7 @@ export default defineAgent({
   prewarm: async (proc) => {
     proc.userData.model = new realtime.RealtimeModel({
       apiKey: openaiApiKey,
+      voice: process.env.OPENAI_VOICE || "alloy", // Options: alloy, echo, shimmer, ash, ballad, coral, sage, verse
     });
   },
   entry: async (ctx) => {
